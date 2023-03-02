@@ -111,7 +111,7 @@ public class UserService {
            logger.error("Invalid token");
            throw new CustomException("Token is not present");
        }
-        SignInDtoResponse response = new SignInDtoResponse("success", authenticationToken.getToken());
+        SignInDtoResponse response = new SignInDtoResponse("success", user.getName(),user.getEmail(),authenticationToken.getToken());
        logger.info("Sign In process completed");
         return response;
     }

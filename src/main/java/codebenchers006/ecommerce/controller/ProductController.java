@@ -89,5 +89,18 @@ public class ProductController {
            throw new CustomException("Product Id not found");
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<Product> getByProductName(@PathVariable String name){
+        Product product = productService.findByProductName(name);
+        if(product !=null){
+            return new ResponseEntity<>(product,HttpStatus.OK);
+        }
+        else{
+            throw new CustomException("Product not found");
+        }
+
+
+    }
+
 }
 

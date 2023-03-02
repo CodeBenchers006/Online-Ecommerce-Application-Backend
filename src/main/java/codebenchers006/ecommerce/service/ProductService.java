@@ -102,4 +102,14 @@ public class ProductService {
         Product product = productRepo.findById(productId).get();
         return getProductDto(product);
     }
+
+    public Product findByProductName(String productName){
+        Product product = productRepo.findByName(productName);
+        if(product==null){
+            throw new CustomException("No Product Found");
+        }
+        else{
+            return product;
+        }
+    }
 }

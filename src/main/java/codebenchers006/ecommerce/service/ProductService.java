@@ -112,4 +112,11 @@ public class ProductService {
             return product;
         }
     }
+
+    public List<Product> findByCategoryId(int id) {
+
+        Category category = categoryService.getCategoryUsingId(id);
+        List<Product> product = productRepo.findByCategory(category);
+        return product;
+    }
 }

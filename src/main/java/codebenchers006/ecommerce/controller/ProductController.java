@@ -102,5 +102,11 @@ public class ProductController {
 
     }
 
+    @GetMapping("/category/{id}")
+    public ResponseEntity<List<Product>> getByCategoryId(@PathVariable int id){
+        List<Product> product = productService.findByCategoryId(id);
+        return new ResponseEntity<>(product,HttpStatus.OK);
+    }
+
 }
 

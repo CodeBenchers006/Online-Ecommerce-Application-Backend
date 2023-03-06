@@ -1,7 +1,5 @@
 package codebenchers006.ecommerce.model;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,15 +10,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 @Entity
-public class Inventory {
+public class Sales {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int inventory_id;
+    private int sales_id;
 
     @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name = "product_id", referencedColumnName = "product_id")
     private Product product;
 
-    private int totalItems;
+    private int totalSales;
+
+
 }

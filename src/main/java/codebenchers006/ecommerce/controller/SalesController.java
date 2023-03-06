@@ -1,11 +1,11 @@
 package codebenchers006.ecommerce.controller;
 
-
 import codebenchers006.ecommerce.model.Inventory;
 import codebenchers006.ecommerce.model.Product;
+import codebenchers006.ecommerce.model.Sales;
 import codebenchers006.ecommerce.response.ApiResponse;
-import codebenchers006.ecommerce.service.InventoryService;
 import codebenchers006.ecommerce.service.ProductService;
+import codebenchers006.ecommerce.service.SalesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,44 +18,44 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/inventory")
-public class InventoryController {
+@RequestMapping("/sales")
+public class SalesController {
 
     @Autowired
-    InventoryService inventoryService;
+    SalesService salesService;
 
     @Autowired
     ProductService productService;
 
-    @GetMapping("/checkAll")
-    public ResponseEntity<?> getAllInventories(){
+    @GetMapping("/checkAllSales")
+    public ResponseEntity<?> getAllSales(){
 
         try{
-            List<Inventory> inventoryList = inventoryService.getInventoryList();
+            List<Sales> salesList = salesService.getSalesList();
 
-            if(inventoryList.isEmpty()){
-                return new ResponseEntity<>("Inventory List Empty",HttpStatus.NOT_FOUND);
+            if(salesList.isEmpty()){
+                return new ResponseEntity<>("Sales list is empty", HttpStatus.NOT_FOUND);
             }
             else{
-                return new ResponseEntity<>(inventoryList, HttpStatus.OK);
+                return new ResponseEntity<>(salesList, HttpStatus.OK);
             }
         }
         catch(Exception e){
-            return new ResponseEntity<>(new ApiResponse(false,"No inventory found"),HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ApiResponse(false,"No Sales info found"),HttpStatus.NOT_FOUND);
         }
     }
 
-    @GetMapping("/getByProduct/{product_id}")
-    public ResponseEntity<?> getByProduct(int product_id){
+
+    @GetMapping("/getSalesByProduct/{product_id}")
+    public ResponseEntity<?> getSalesByProduct(int product_id){
 
         try{
             Product product = productService.findByProductId(product_id);
-            Inventory inventory = inventoryService.findInventoryItemsByProduct(product);
-            return new ResponseEntity<>(inventory,HttpStatus.OK);
+            Sales sales = salesService.findSaleItemsByProduct(product);
+            return new ResponseEntity<>(sales,HttpStatus.OK);
         }
         catch (Exception e){
             return new ResponseEntity<>(new ApiResponse(false,"not found"),HttpStatus.NOT_FOUND);
         }
     }
-
 }

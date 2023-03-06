@@ -46,6 +46,9 @@ public class OrderService {
     @Autowired
     InventoryService inventoryService;
 
+    @Autowired
+    SalesService salesService;
+
 
     public Session createSession(List<CheckoutDto> checkoutDtoList) throws StripeException {
 
@@ -140,6 +143,27 @@ public class OrderService {
                     log.info("updating inventory after order placed");
                     inventoryService.addInventory(inventory);
 
+                }
+
+                if(salesService.findSaleItemsByProduct(prod)==null){
+                    log.info("Creating a new sale record for Product: "+prod.getName());
+
+                    Sales sales = new Sales();
+                    sales.setProduct(prod);
+                    sales.setTotalSales(orderItem.getQuantity());
+
+                    salesService.addSales(sales);
+
+                }
+                else{
+                    log.info("Updating sale record for product :"+prod.getName());
+                    Sales sales = salesService.findSaleItemsByProduct(prod);
+
+                    int totalSales = sales.getTotalSales() + orderItem.getQuantity();
+                    log.info("Total sale of "+prod.getName()+ " is : "+totalSales);
+                    sales.setTotalSales(totalSales);
+
+                    salesService.addSales(sales);
                 }
 
                 orderItemsRepository.save(orderItem);

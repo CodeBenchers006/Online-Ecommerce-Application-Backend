@@ -37,7 +37,6 @@ public class CategoryService {
 
             oldCategory.setCategoryName(category.getCategoryName());
             oldCategory.setDescription(category.getDescription());
-            oldCategory.setImageUrl(category.getImageUrl());
             oldCategory.setProducts(category.getProducts());
             categoryRepo.save(oldCategory);
 

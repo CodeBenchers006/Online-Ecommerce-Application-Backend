@@ -39,6 +39,8 @@ public class ProductService {
         product.setPrice(productDTO.getPrice());
         product.setCategory(category);
 
+        System.out.println(productDTO);
+
         Inventory inventory = new Inventory();
         inventory.setProduct(product);
         inventory.setTotalItems(productDTO.getTotalItems());

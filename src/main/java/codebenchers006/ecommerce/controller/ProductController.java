@@ -71,6 +71,7 @@ public class ProductController {
 
     @DeleteMapping("/delete/{product_id}")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable int product_id){
+        System.out.println(productService.findById(product_id));
         if(productService.findById(product_id)){
             productService.deleteProduct(product_id);
             return new ResponseEntity<>(new ApiResponse(true, "Product deleted successfully"),HttpStatus.OK);
@@ -88,6 +89,26 @@ public class ProductController {
         else
            throw new CustomException("Product Id not found");
     }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<Product> getByProductName(@PathVariable String name){
+        Product product = productService.findByProductName(name);
+        if(product !=null){
+            return new ResponseEntity<>(product,HttpStatus.OK);
+        }
+        else{
+            throw new CustomException("Product not found");
+        }
+
+    }
+
+    @GetMapping("/category/{id}")
+    public ResponseEntity<List<Product>> getByCategoryId(@PathVariable int id){
+        List<Product> product = productService.findByCategoryId(id);
+        return new ResponseEntity<>(product,HttpStatus.OK);
+    }
+
+
 
 }
 

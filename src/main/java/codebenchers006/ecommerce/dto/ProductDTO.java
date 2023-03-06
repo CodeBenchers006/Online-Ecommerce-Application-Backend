@@ -15,4 +15,6 @@ public class ProductDTO {
     private @NotNull double price;
     private @NotNull String description;
     private @NotNull int categoryId;
+
+    private int totalItems;
 }

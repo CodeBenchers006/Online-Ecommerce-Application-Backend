@@ -12,6 +12,10 @@ import lombok.Setter;
 public class SignInDtoResponse {
 
     private String status;
+
+    private String name;
+
+    private String email;
     private String token;
 
 

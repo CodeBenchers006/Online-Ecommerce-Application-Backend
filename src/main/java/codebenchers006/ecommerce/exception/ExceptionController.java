@@ -12,4 +12,9 @@ public class ExceptionController {
     public ResponseEntity<String> handleCustomException(CustomException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = AuthenticationFailException.class)
+    public final ResponseEntity<String> handleUpdateFailException(AuthenticationFailException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

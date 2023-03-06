@@ -20,7 +20,7 @@ public class Category {
     private int id;
     private @NotBlank String categoryName;
     private @NotBlank String description;
-    private @NotBlank String imageUrl;
+
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     Set<Product> products;

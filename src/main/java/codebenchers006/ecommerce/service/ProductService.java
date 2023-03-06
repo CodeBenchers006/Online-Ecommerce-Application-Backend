@@ -3,6 +3,7 @@ package codebenchers006.ecommerce.service;
 import codebenchers006.ecommerce.dto.ProductDTO;
 import codebenchers006.ecommerce.exception.CustomException;
 import codebenchers006.ecommerce.model.Category;
+import codebenchers006.ecommerce.model.Inventory;
 import codebenchers006.ecommerce.model.Product;
 import codebenchers006.ecommerce.repository.ProductRepo;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +26,9 @@ public class ProductService {
     @Autowired
     CategoryService categoryService;
 
+    @Autowired
+    InventoryService inventoryService;
+
     public void createProduct(ProductDTO productDTO, Category category) {
 
         Product product = new Product();
@@ -35,8 +39,18 @@ public class ProductService {
         product.setPrice(productDTO.getPrice());
         product.setCategory(category);
 
+        System.out.println(productDTO);
+
+        Inventory inventory = new Inventory();
+        inventory.setProduct(product);
+        inventory.setTotalItems(productDTO.getTotalItems());
+
         logger.info("New product created successfully");
         productRepo.save(product);
+
+        logger.info("Adding product to inventory list");
+        inventoryService.addInventory(inventory);
+        logger.info("Inventory Created for Product : "+inventory.getProduct().getName()+" with total items : "+inventory.getTotalItems());
     }
 
     public List<Product> showProducts() {
@@ -81,6 +95,10 @@ public class ProductService {
         product.setCategory(category);
         productRepo.save(product);
         logger.info("Product updated successfully");
+
+        Inventory inventory = inventoryService.findInventoryItemsByProduct(product);
+        inventory.setTotalItems(productDTO.getTotalItems());
+        inventoryService.addInventory(inventory);
     }
 
 
@@ -101,5 +119,22 @@ public class ProductService {
     public ProductDTO getUsingId(int productId) {
         Product product = productRepo.findById(productId).get();
         return getProductDto(product);
+    }
+
+    public Product findByProductName(String productName){
+        Product product = productRepo.findByName(productName);
+        if(product==null){
+            throw new CustomException("No Product Found");
+        }
+        else{
+            return product;
+        }
+    }
+
+    public List<Product> findByCategoryId(int id) {
+
+        Category category = categoryService.getCategoryUsingId(id);
+        List<Product> product = productRepo.findByCategory(category);
+        return product;
     }
 }

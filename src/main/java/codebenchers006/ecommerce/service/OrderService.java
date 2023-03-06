@@ -5,15 +5,14 @@ import codebenchers006.ecommerce.dto.cart.CartItemDto;
 import codebenchers006.ecommerce.dto.checkout.CheckoutDto;
 import codebenchers006.ecommerce.dto.order.OrderAdmin;
 import codebenchers006.ecommerce.exception.CustomException;
-import codebenchers006.ecommerce.model.Order;
-import codebenchers006.ecommerce.model.OrderItem;
-import codebenchers006.ecommerce.model.User;
+import codebenchers006.ecommerce.model.*;
 import codebenchers006.ecommerce.repository.OrderItemsRepository;
 import codebenchers006.ecommerce.repository.OrderRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+import lombok.extern.java.Log;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+@Log
 @Service
 public class OrderService {
 
@@ -42,6 +42,9 @@ public class OrderService {
 
     @Autowired
     OrderItemsRepository orderItemsRepository;
+
+    @Autowired
+    InventoryService inventoryService;
 
 
     public Session createSession(List<CheckoutDto> checkoutDtoList) throws StripeException {
@@ -116,6 +119,28 @@ public class OrderService {
                         .order(neworder)
                         .build();
 
+
+                Product prod = orderItem.getProduct();
+
+                log.info("order placed");
+
+                if(inventoryService.findInventoryItemsByProduct(prod)!=null){
+                    log.info("Finding Inventory using product");
+                    Inventory inventory = inventoryService.findInventoryItemsByProduct(prod);
+                    log.info("Inventory found");
+                    log.info("Updating total items left in the inventory after placing the order");
+                    log.info("Total items for "+orderItem.getProduct().getName()+" was :"+inventory.getTotalItems());
+                    log.info("Total quantity of "+orderItem.getProduct().getName()+" was ordered :"+orderItem.getQuantity());
+
+                    int totalItemsUpdated=inventory.getTotalItems() - orderItem.getQuantity();
+
+                    inventory.setTotalItems(totalItemsUpdated);
+                    log.info("Total items for "+orderItem.getProduct().getName()+" is left now :"+inventory.getTotalItems());
+
+                    log.info("updating inventory after order placed");
+                    inventoryService.addInventory(inventory);
+
+                }
 
                 orderItemsRepository.save(orderItem);
             }

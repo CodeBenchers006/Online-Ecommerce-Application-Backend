@@ -1,11 +1,11 @@
 package codebenchers006.ecommerce.dto;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class ProductDTO {
 

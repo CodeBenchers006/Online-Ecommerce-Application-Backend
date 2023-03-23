@@ -1,13 +1,16 @@
 package codebenchers006.ecommerce.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "product_table")
 public class Product {
@@ -18,6 +21,8 @@ public class Product {
     private @NotNull String name;
     private @NotNull String imageUrl;
     private @NotNull double price;
+
+    @Lob
     private @NotNull String description;
 
     //Many to One Relationship

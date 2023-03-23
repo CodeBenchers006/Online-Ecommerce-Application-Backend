@@ -16,6 +16,7 @@ public class CategoryService {
     @Autowired
     CategoryRepo categoryRepo;
     public void createCategory(Category category){
+       // System.out.println("adding category");
         categoryRepo.save(category);
     }
 

@@ -9,10 +9,7 @@ import codebenchers006.ecommerce.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -46,7 +43,7 @@ public class InventoryController {
     }
 
     @GetMapping("/getByProduct/{product_id}")
-    public ResponseEntity<?> getByProduct(int product_id){
+    public ResponseEntity<?> getByProduct(@PathVariable int product_id){
 
         try{
             Product product = productService.findByProductId(product_id);

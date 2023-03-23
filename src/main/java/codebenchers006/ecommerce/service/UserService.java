@@ -115,4 +115,16 @@ public class UserService {
        logger.info("Sign In process completed");
         return response;
     }
+
+    public User findUserById(int user_id){
+        return userRepo.findById(user_id).get();
+    }
+
+    public boolean checkIfUserExists(int user_id){
+        User user = userRepo.findById(user_id).get();
+        if(user!=null){
+            return true;
+        }
+        else return false;
+    }
 }

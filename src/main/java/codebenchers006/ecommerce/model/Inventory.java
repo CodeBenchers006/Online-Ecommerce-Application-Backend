@@ -18,8 +18,8 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int inventory_id;
 
-    @OneToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "product_id", referencedColumnName = "product_id")
+    @OneToOne(cascade=CascadeType.REMOVE)
+    @JoinColumn(name = "product_id", referencedColumnName = "product_id",nullable = true)
     private Product product;
 
     private int totalItems;

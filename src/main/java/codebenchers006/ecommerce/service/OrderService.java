@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +49,9 @@ public class OrderService {
 
     @Autowired
     SalesService salesService;
+
+    @Autowired
+    UserShippingAddressService userShippingAddressService;
 
 
     public Session createSession(List<CheckoutDto> checkoutDtoList) throws StripeException {
@@ -102,12 +106,17 @@ public class OrderService {
             SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
             String currenDate = formatter.format(date);
 
+            UserShippingAddress userShippingAddress = userShippingAddressService.findAddressUsingUser(user);
+            String address = userShippingAddress.getAddress()+", "+userShippingAddress.getApartment()+", "+userShippingAddress.getCity()+", "+userShippingAddress.getState()+", "+userShippingAddress.getCountry()+", "+userShippingAddress.getPin();
+
+
             // create the order and save it
             Order neworder = Order.builder()
                     .createdDate(currenDate)
                     .sessionId(sessionId)
                     .user(user)
                     .totalPrice(cartDto.getTotalCost())
+                    .deliveryAddress(address)
                     .build();
 
             orderRepository.save(neworder);
@@ -120,6 +129,7 @@ public class OrderService {
                         .product(cartItemDto.getProduct())
                         .quantity(cartItemDto.getQuantity())
                         .order(neworder)
+                        .deliveryAddress(address)
                         .build();
 
 
@@ -198,7 +208,7 @@ public class OrderService {
             Date d2 = new Date();
 
             SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
-            String currenDate = formatter.format(d2);
+            String currentDate = formatter.format(d2);
 
             String status="";
 
@@ -206,7 +216,7 @@ public class OrderService {
                 status= "Dispatched, will be delivered in 7 business days";
             }
             else{
-                status="Delivered on "+currenDate;
+                status="Delivered on "+currentDate;
             }
 
             OrderAdmin data = OrderAdmin.builder()
@@ -214,7 +224,7 @@ public class OrderService {
                     .customerName(order.getOrder().getUser().getName())
                     .productName(order.getProduct().getName())
                     .orderDate(order.getCreatedDate())
-                    .address("xyz")
+                    .address(order.getDeliveryAddress())
                     .status(status)
                     .build();
 

@@ -13,4 +13,6 @@ public class OrderDto {
 
     private int id;
     private @NotNull int userId;
+
+    private String deliveryAddress;
 }

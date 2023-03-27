@@ -14,10 +14,13 @@ import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.extern.java.Log;
 import org.aspectj.weaver.ast.Or;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -53,7 +56,7 @@ public class OrderService {
     @Autowired
     UserShippingAddressService userShippingAddressService;
 
-
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
     public Session createSession(List<CheckoutDto> checkoutDtoList) throws StripeException {
 
         //success and failure urls
@@ -204,7 +207,24 @@ public class OrderService {
 
         for(OrderItem order: orderList){
 
-            Date d1 = new Date(order.getCreatedDate());
+            String createdDateStr = order.getCreatedDate();
+            if (createdDateStr == null) {
+                // Skip this order and log the error
+                logger.error("Invalid created date for order: {}", order.getId());
+                continue;
+            }
+
+            Date d1;
+            try {
+                d1 = new SimpleDateFormat("yyyy-MM-dd").parse(createdDateStr);
+            } catch (IllegalArgumentException e) {
+                // Skip this order and log the error
+                logger.error("Invalid created date format for order {}: {}", order.getId(), createdDateStr, e);
+                continue;
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+
             Date d2 = new Date();
 
             SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
@@ -232,9 +252,6 @@ public class OrderService {
 
 
         }
-
-
-
 
         return orderAdminList;
     }

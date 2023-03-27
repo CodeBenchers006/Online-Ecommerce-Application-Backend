@@ -82,7 +82,7 @@ public class ProductServiceTest {
         Product p = new Product(1,"pname","purl",123,"pdes",new Category());
 
         when(productRepo.findById(1)).thenReturn(Optional.of(p));
-        Assertions.assertEquals(true,productService.findById(1));
+        Assertions.assertEquals(true,productService.findByIdExist(1));
         Assertions.assertEquals(p.getProduct_id(),productService.findByProductId(p.getProduct_id()).getProduct_id());
     }
 
@@ -135,6 +135,11 @@ public class ProductServiceTest {
         verify(productRepo).deleteById(p.getProduct_id());
 
     }
+
+
+
+
+
 
 
 }

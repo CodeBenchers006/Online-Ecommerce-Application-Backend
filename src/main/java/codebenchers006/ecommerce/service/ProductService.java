@@ -80,14 +80,14 @@ public class ProductService {
         return productDTOS;
     }
 
-    public Boolean findById(int productId){
+    public Boolean findByIdExist(int productId){
         return productRepo.findById(productId).isPresent();
     }
 
     public void updateProduct(int product_id,ProductDTO productDTO) {
         logger.info("Updating product details");
         Category category = categoryService.getCategoryUsingId(productDTO.getCategoryId());
-        if(findById(product_id)){
+        if(findByIdExist(product_id)){
             Product product = new Product();
             product.setProduct_id(product_id);
             product.setName(productDTO.getName());
@@ -99,8 +99,10 @@ public class ProductService {
             logger.info("Product updated successfully");
 
             Inventory inventory = inventoryService.findInventoryItemsByProduct(product);
-            inventory.setTotalItems(productDTO.getTotalItems());
-            inventoryService.addInventory(inventory);
+            if(inventory!=null){
+                inventory.setTotalItems(productDTO.getTotalItems());
+                inventoryService.addInventory(inventory);
+            }
         }
     }
 

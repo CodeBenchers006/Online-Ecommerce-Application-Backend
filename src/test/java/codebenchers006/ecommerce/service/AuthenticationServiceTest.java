@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -86,4 +87,21 @@ public class AuthenticationServiceTest {
        AuthenticationToken ex = authenticationService.getAuthenticationData(token.getToken());
        Assertions.assertEquals(ex,token);
    }
+
+    @Test
+    public void testAuthenticateWithNullToken() {
+        // Call the method to be tested with a null token and assert that it throws a CustomException
+        assertThrows(CustomException.class, () -> authenticationService.authenticate(null));
+    }
+
+    @Test
+    public void testAuthenticateWithInvalidToken() {
+        // Create a mock token string
+        String mockToken = "mock-token";
+
+
+        // Call the method to be tested with the mock token string and assert that it throws a CustomException
+        assertThrows(CustomException.class, () -> authenticationService.authenticate(mockToken));
+    }
+
 }

@@ -60,7 +60,7 @@ public class ProductController {
     @PutMapping("/update/{product_id}")
     public ResponseEntity<ApiResponse> updateProduct(@PathVariable int product_id,@RequestBody ProductDTO productDTO){
 
-        if(productService.findById(product_id)){
+        if(productService.findByIdExist(product_id)){
             productService.updateProduct(product_id,productDTO);
             System.out.println("Product data updated");
             return new ResponseEntity<>(new ApiResponse(true, "Product details updated successfully"),HttpStatus.OK);
@@ -71,8 +71,8 @@ public class ProductController {
 
     @DeleteMapping("/delete/{product_id}")
     public ResponseEntity<ApiResponse> deleteProduct(@PathVariable int product_id){
-        System.out.println(productService.findById(product_id));
-        if(productService.findById(product_id)){
+        System.out.println(productService.findByIdExist(product_id));
+        if(productService.findByIdExist(product_id)){
             productService.deleteProduct(product_id);
             return new ResponseEntity<>(new ApiResponse(true, "Product deleted successfully"),HttpStatus.OK);
         }
@@ -82,7 +82,7 @@ public class ProductController {
 
     @GetMapping("/{product_id}")
     public ResponseEntity<ProductDTO> getById(@PathVariable int product_id){
-        if(productService.findById(product_id)){
+        if(productService.findByIdExist(product_id)){
             ProductDTO product = productService.getUsingId(product_id);
             return new ResponseEntity<>(product,HttpStatus.OK);
         }

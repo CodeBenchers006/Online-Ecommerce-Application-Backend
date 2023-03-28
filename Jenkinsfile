@@ -1,26 +1,27 @@
 pipeline {
     agent any
 
-    tools {
-        maven "M3"
-    }
-
     stages {
-        stage('Build') {
+        stage('Cleaning Stage') {
             steps {
-
-                git 'https://github.com/CodeBenchers006/Online-Ecommerce-Application-Backend.git'
-
-
-                bat "mvn -Dmaven.test.failure.ignore=true clean package"
+                bat "mvn clean"
             }
-
-            post {
-
-                success {
-                    junit '**/target/surefire-reports/TEST-*.xml'
-                    archiveArtifacts 'target/*.jar'
-                }
+        }
+       stage('Testing Stage') {
+            steps {
+                bat "mvn test"
+            }
+        }
+        stage('Packaging Stage') {
+            steps {
+                bat "mvn package"
+            }
+        }
+        stage('Consolidate Results') {
+            steps {
+                input("Do you want to capture results?")
+                junit '**/target/sunfire-reports/Test-*.xml'
+                archive 'target/*.jar'
             }
         }
     }

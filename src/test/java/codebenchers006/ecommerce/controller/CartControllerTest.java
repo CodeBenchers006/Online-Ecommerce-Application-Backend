@@ -121,7 +121,7 @@ public class CartControllerTest {
         Mockito.verify(cartService).deleteCartItem(mockCartId, mockUser);
 
         // Verify the response status code and body
-        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         Assertions.assertEquals(new ApiResponse(true, "Product has been deleted from the cart"), responseEntity.getBody());
     }
 

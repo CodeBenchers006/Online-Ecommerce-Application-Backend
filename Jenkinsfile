@@ -1,20 +1,26 @@
 pipeline {
     agent any
 
+    tools {
+        maven "MAVEN_HOME"
+    }
+
     stages {
         stage('Build') {
             steps {
-                echo 'Hello World'
+
+                git 'https://github.com/CodeBenchers006/Online-Ecommerce-Application-Backend.git'
+
+
+                bat "mvn -Dmaven.test.failure.ignore=true clean package"
             }
-        }
-        stage('Test') {
-            steps {
-                echo 'Hello World'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Hello World'
+
+            post {
+
+                success {
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'target/*.jar'
+                }
             }
         }
     }

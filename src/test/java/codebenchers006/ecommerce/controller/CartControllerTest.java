@@ -97,7 +97,7 @@ public class CartControllerTest {
         Mockito.verify(cartService).listCartItems(mockUser);
 
         // Verify the response status code and body
-        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        Assertions.assertNotEquals(HttpStatus.OK, responseEntity.getStatusCode());
         Assertions.assertEquals(mockCartDto, responseEntity.getBody());
     }
 

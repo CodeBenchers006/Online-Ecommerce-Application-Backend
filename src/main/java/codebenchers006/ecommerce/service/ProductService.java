@@ -29,7 +29,7 @@ public class ProductService {
     @Autowired
     InventoryService inventoryService;
 
-    public void createProduct(ProductDTO productDTO, Category category) {
+    public Product createProduct(ProductDTO productDTO, Category category) {
 
         Product product = new Product();
         logger.info("Setting Product Data");
@@ -51,6 +51,7 @@ public class ProductService {
         logger.info("Adding product to inventory list");
         inventoryService.addInventory(inventory);
         logger.info("Inventory Created for Product : "+inventory.getProduct().getName()+" with total items : "+inventory.getTotalItems());
+        return product;
     }
 
     public List<Product> showProducts() {
@@ -79,26 +80,30 @@ public class ProductService {
         return productDTOS;
     }
 
-    public Boolean findById(int productId){
+    public Boolean findByIdExist(int productId){
         return productRepo.findById(productId).isPresent();
     }
 
     public void updateProduct(int product_id,ProductDTO productDTO) {
         logger.info("Updating product details");
         Category category = categoryService.getCategoryUsingId(productDTO.getCategoryId());
-        Product product = new Product();
-        product.setProduct_id(product_id);
-        product.setName(productDTO.getName());
-        product.setPrice(productDTO.getPrice());
-        product.setDescription(productDTO.getDescription());
-        product.setImageUrl(productDTO.getImageUrl());
-        product.setCategory(category);
-        productRepo.save(product);
-        logger.info("Product updated successfully");
+        if(findByIdExist(product_id)){
+            Product product = new Product();
+            product.setProduct_id(product_id);
+            product.setName(productDTO.getName());
+            product.setPrice(productDTO.getPrice());
+            product.setDescription(productDTO.getDescription());
+            product.setImageUrl(productDTO.getImageUrl());
+            product.setCategory(category);
+            productRepo.save(product);
+            logger.info("Product updated successfully");
 
-        Inventory inventory = inventoryService.findInventoryItemsByProduct(product);
-        inventory.setTotalItems(productDTO.getTotalItems());
-        inventoryService.addInventory(inventory);
+            Inventory inventory = inventoryService.findInventoryItemsByProduct(product);
+            if(inventory!=null){
+                inventory.setTotalItems(productDTO.getTotalItems());
+                inventoryService.addInventory(inventory);
+            }
+        }
     }
 
 

@@ -14,11 +14,15 @@ import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.extern.java.Log;
 import org.aspectj.weaver.ast.Or;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +53,10 @@ public class OrderService {
     @Autowired
     SalesService salesService;
 
+    @Autowired
+    UserShippingAddressService userShippingAddressService;
 
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
     public Session createSession(List<CheckoutDto> checkoutDtoList) throws StripeException {
 
         //success and failure urls
@@ -102,12 +109,17 @@ public class OrderService {
             SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
             String currenDate = formatter.format(date);
 
+            UserShippingAddress userShippingAddress = userShippingAddressService.findAddressUsingUser(user);
+            String address = userShippingAddress.getAddress()+", "+userShippingAddress.getApartment()+", "+userShippingAddress.getCity()+", "+userShippingAddress.getState()+", "+userShippingAddress.getCountry()+", "+userShippingAddress.getPin();
+
+
             // create the order and save it
             Order neworder = Order.builder()
                     .createdDate(currenDate)
                     .sessionId(sessionId)
                     .user(user)
                     .totalPrice(cartDto.getTotalCost())
+                    .deliveryAddress(address)
                     .build();
 
             orderRepository.save(neworder);
@@ -120,6 +132,7 @@ public class OrderService {
                         .product(cartItemDto.getProduct())
                         .quantity(cartItemDto.getQuantity())
                         .order(neworder)
+                        .deliveryAddress(address)
                         .build();
 
 
@@ -194,11 +207,28 @@ public class OrderService {
 
         for(OrderItem order: orderList){
 
-            Date d1 = new Date(order.getCreatedDate());
+            String createdDateStr = order.getCreatedDate();
+            if (createdDateStr == null) {
+                // Skip this order and log the error
+                logger.error("Invalid created date for order: {}", order.getId());
+                continue;
+            }
+
+            Date d1;
+            try {
+                d1 = new SimpleDateFormat("yyyy-MM-dd").parse(createdDateStr);
+            } catch (IllegalArgumentException e) {
+                // Skip this order and log the error
+                logger.error("Invalid created date format for order {}: {}", order.getId(), createdDateStr, e);
+                continue;
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+
             Date d2 = new Date();
 
             SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy");
-            String currenDate = formatter.format(d2);
+            String currentDate = formatter.format(d2);
 
             String status="";
 
@@ -206,7 +236,7 @@ public class OrderService {
                 status= "Dispatched, will be delivered in 7 business days";
             }
             else{
-                status="Delivered on "+currenDate;
+                status="Delivered on "+currentDate;
             }
 
             OrderAdmin data = OrderAdmin.builder()
@@ -214,7 +244,7 @@ public class OrderService {
                     .customerName(order.getOrder().getUser().getName())
                     .productName(order.getProduct().getName())
                     .orderDate(order.getCreatedDate())
-                    .address("xyz")
+                    .address(order.getDeliveryAddress())
                     .status(status)
                     .build();
 
@@ -222,9 +252,6 @@ public class OrderService {
 
 
         }
-
-
-
 
         return orderAdminList;
     }
